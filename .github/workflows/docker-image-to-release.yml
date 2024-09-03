@@ -26,13 +26,12 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
       
-    - uses: actions/checkout@v3
-    - uses: Nats-ji/delete-old-releases@v1
+    - name: actions/checkout@v3
+      uses: Nats-ji/delete-old-releases@v1
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-        keep-count: 5
-        keep-old-minor-releases: false
-        keep-old-minor-releases-count: 1
+        keep-count: 1
+        keep-old-minor-releases: true
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
