@@ -26,8 +26,8 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
       
-    - name: delete old releases
-      uses: Nats-ji/delete-old-releases@v1
+    - uses: actions/checkout@v3
+    - uses: Nats-ji/delete-old-releases@v1
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         keep-count: 5
