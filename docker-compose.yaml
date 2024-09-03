@@ -1,0 +1,8 @@
+services:
+  zns:
+    image: firerui/zns:latest
+    restart: always
+    ports:
+      - "127.0.0.1:40443:443"
+    network_mode: 1panel-network
+    container_name: firerui-zns
