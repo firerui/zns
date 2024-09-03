@@ -1,7 +1,6 @@
 package main
 
 import (
-	"crypto/tls"
 	"flag"
 	"fmt"
 	"log"
@@ -13,7 +12,6 @@ import (
 
 	"github.com/quic-go/quic-go/http3"
 	"github.com/taoso/zns"
-	"golang.org/x/crypto/acme/autocert"
 )
 
 var tlsCert string
@@ -75,23 +73,23 @@ If not free, you should set the following environment variables:
 
 	flag.Parse()
 
-	var tlsCfg *tls.Config
-	if tlsHosts != "" {
-		acm := autocert.Manager{
-			Prompt:     autocert.AcceptTOS,
-			Cache:      autocert.DirCache(os.Getenv("HOME") + "/.autocert"),
-			HostPolicy: autocert.HostWhitelist(strings.Split(tlsHosts, ",")...),
-		}
+	// var tlsCfg *tls.Config
+	// if tlsHosts != "" {
+	// 	acm := autocert.Manager{
+	// 		Prompt:     autocert.AcceptTOS,
+	// 		Cache:      autocert.DirCache(os.Getenv("HOME") + "/.autocert"),
+	// 		HostPolicy: autocert.HostWhitelist(strings.Split(tlsHosts, ",")...),
+	// 	}
 
-		tlsCfg = acm.TLSConfig()
-	} else {
-		tlsCfg = &tls.Config{}
-		certs, err := tls.LoadX509KeyPair(tlsCert, tlsKey)
-		if err != nil {
-			panic(err)
-		}
-		tlsCfg.Certificates = []tls.Certificate{certs}
-	}
+	// 	tlsCfg = acm.TLSConfig()
+	// } else {
+	// 	tlsCfg = &tls.Config{}
+	// 	certs, err := tls.LoadX509KeyPair(tlsCert, tlsKey)
+	// 	if err != nil {
+	// 		panic(err)
+	// 	}
+	// 	tlsCfg.Certificates = []tls.Certificate{certs}
+	// }
 
 	lnH12, lnH3, err := listen()
 	if err != nil {
@@ -125,11 +123,15 @@ If not free, you should set the following environment variables:
 		h.AltSvc = fmt.Sprintf(`h3=":%d"`, p)
 		th.AltSvc = h.AltSvc
 
-		h3 := http3.Server{Handler: mux, TLSConfig: tlsCfg}
+		h3 := http3.Server{Handler: mux}
 		go h3.Serve(lnH3)
 	}
 
-	lnTLS := tls.NewListener(lnH12, tlsCfg)
+	// lnTLS := tls.NewListener(lnH12, tlsCfg)
+	// if err = http.Serve(lnTLS, mux); err != nil {
+	// 	log.Fatal(err)
+	// }
+	lnTLS := net.Listener(lnH12)
 	if err = http.Serve(lnTLS, mux); err != nil {
 		log.Fatal(err)
 	}
